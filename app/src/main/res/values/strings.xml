@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Movies</string>
     <string name="popular_title">Popular</string>
-    <string name="movieicon_content_desc">MovieIcon</string>
-    <string name="movie_title_stub">Movie Title</string>
-    <string name="movie_subtitle_stub">Movie Subtitle</string>
-    <string name="movie_item_subtitle_format">%1$s (%2$s)</string>
+    <string name="movieicon_content_desc" translatable="false">MovieIcon</string>
+    <string name="movie_title_stub" translatable="false">Movie Title</string>
+    <string name="movie_subtitle_stub" translatable="false">Movie Subtitle</string>
+    <string name="movie_item_subtitle_format" translatable="false">%1$s (%2$s)</string>
 </resources>
