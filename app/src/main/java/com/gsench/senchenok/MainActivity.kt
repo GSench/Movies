@@ -48,19 +48,18 @@ class MainActivity : AppCompatActivity() {
                     .films
                     .map { kinopoiskMovie ->
                         MovieListItem(
-                        title = kinopoiskMovie.nameRu ?: "",
+                        title = kinopoiskMovie.nameRu,
                         genre = kinopoiskMovie
                             .genres
-                            .take(3)
-                            .map{ genreObj ->
+                            .take(3).joinToString { genreObj ->
                                 genreObj.genre.replaceFirstChar {
                                     if (it.isLowerCase()) it.titlecase(
                                         Locale.getDefault()
                                     ) else it.toString()
-                            } }
-                            .joinToString(),
-                        year = kinopoiskMovie.year ?: "????",
-                        iconUrl = kinopoiskMovie.posterUrlPreview ?: ""
+                                }
+                            },
+                        year = kinopoiskMovie.year,
+                        iconUrl = kinopoiskMovie.posterUrlPreview
                     ) }
                 binding.progressBar.visibility = View.GONE
             }
