@@ -9,11 +9,14 @@ import com.gsench.senchenok.databinding.MovieListItemBinding
 
 class MovieListAdapter(val context: Context) : RecyclerView.Adapter<MovieListAdapter.MovieListItemViewHolder>() {
 
-    var movieList: List<MovieListItem> = emptyList()
-        set(newList) {
-            field = newList
-            notifyDataSetChanged()
-        }
+    private val movieList: MutableList<MovieListItem> = mutableListOf()
+
+    fun appendMovies(movies: List<MovieListItem>) {
+        val prevListSize = movieList.size
+        movieList.addAll(movies)
+        notifyItemRangeInserted(prevListSize, movies.size)
+    }
+
     class MovieListItemViewHolder (val binding: MovieListItemBinding): RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieListItemViewHolder {

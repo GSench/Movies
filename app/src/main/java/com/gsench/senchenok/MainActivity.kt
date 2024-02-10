@@ -1,9 +1,12 @@
 package com.gsench.senchenok
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.gsench.senchenok.databinding.ActivityMainBinding
 import com.gsench.senchenok.kinopoisk_api.KinopoiskApi
 import kotlinx.coroutines.CoroutineScope
@@ -18,6 +21,12 @@ import java.util.Locale
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var kinopoiskApi: KinopoiskApi
+    private lateinit var movieListAdapter: MovieListAdapter
+
+    private var totalPagesCount = 1
+    private var lastMovieListPageLoaded = 0
+    private var isLoading = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,9 +34,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.mainToolbar.title = getString(R.string.popular_title)
         setSupportActionBar(binding.mainToolbar)
-        val movieListAdapter = MovieListAdapter(this)
+        movieListAdapter = MovieListAdapter(this)
+        val movieLayoutManager = LinearLayoutManager(this)
         with(binding.movieListView) {
-            layoutManager = LinearLayoutManager(this@MainActivity)
+            layoutManager = movieLayoutManager
             adapter = movieListAdapter
         }
         val httpInterceptor = HttpLoggingInterceptor()
@@ -40,28 +50,56 @@ class MainActivity : AppCompatActivity() {
             .baseUrl("https://kinopoiskapiunofficial.tech")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-        val kinopoiskApi = retrofit.create(KinopoiskApi::class.java)
-        CoroutineScope(Dispatchers.IO).launch {
-            val kinopoiskMoviesList = kinopoiskApi.getTop100Movies("e30ffed0-76ab-4dd6-b41f-4c9da2b2735b")
-            runOnUiThread {
-                movieListAdapter.movieList = kinopoiskMoviesList
-                    .films
-                    .map { kinopoiskMovie ->
-                        MovieListItem(
-                        title = kinopoiskMovie.nameRu,
-                        genre = kinopoiskMovie
-                            .genres
-                            .take(3).joinToString { genreObj ->
-                                genreObj.genre.replaceFirstChar {
-                                    if (it.isLowerCase()) it.titlecase(
-                                        Locale.getDefault()
-                                    ) else it.toString()
-                                }
-                            },
-                        year = kinopoiskMovie.year,
-                        iconUrl = kinopoiskMovie.posterUrlPreview
-                    ) }
-                binding.progressBar.visibility = View.GONE
+        kinopoiskApi = retrofit.create(KinopoiskApi::class.java)
+
+        binding.movieListView.addOnScrollListener(object: OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val lastVisibleItem = movieLayoutManager.findLastVisibleItemPosition()
+                Log.d("RECYCLER_VIEW", "lastVisibleItem = ${lastVisibleItem}")
+                if(lastVisibleItem > movieListAdapter.itemCount - 6) loadNewPage()
+            }
+        })
+
+        loadNewPage()
+    }
+
+    private fun loadNewPage() {
+        if(lastMovieListPageLoaded < totalPagesCount && !isLoading) {
+            isLoading = true
+            CoroutineScope(Dispatchers.IO).launch {
+                val kinopoiskMoviesList = kinopoiskApi.getTop100Movies(
+                    token = "e30ffed0-76ab-4dd6-b41f-4c9da2b2735b",
+                    page = ++lastMovieListPageLoaded
+                )
+                runOnUiThread {
+                    totalPagesCount = kinopoiskMoviesList.pagesCount
+                    movieListAdapter.appendMovies(kinopoiskMoviesList
+                        .films
+                        .map { kinopoiskMovie ->
+                            MovieListItem(
+                                title = arrayOf(
+                                    kinopoiskMovie.nameRu,
+                                    kinopoiskMovie.nameOriginal,
+                                    kinopoiskMovie.nameEn,
+                                    "???"
+                                    ).firstNotNullOf {it},
+                                genre = kinopoiskMovie
+                                    .genres
+                                    .take(3).joinToString { genreObj ->
+                                        genreObj.genre.replaceFirstChar {
+                                            if (it.isLowerCase()) it.titlecase(
+                                                Locale.getDefault()
+                                            ) else it.toString()
+                                        }
+                                    } ?:"???",
+                                year = kinopoiskMovie.year?:"???",
+                                iconUrl = kinopoiskMovie.posterUrlPreview?:"???"
+                            ) }
+                    )
+                    isLoading = false
+                    binding.progressBar.visibility = View.GONE
+                }
             }
         }
     }
