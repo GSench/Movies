@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Senchenok</string>
-    <string name="popular_title">Популярное</string>
+    <string name="popular_title">Популярные</string>
 </resources>
