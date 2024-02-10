@@ -5,4 +5,10 @@
     <string name="movie_title_stub" translatable="false">Movie Title</string>
     <string name="movie_subtitle_stub" translatable="false">Movie Subtitle</string>
     <string name="movie_item_subtitle_format" translatable="false">%1$s (%2$s)</string>
+    <string name="movie_poster_content_desc" translatable="false">movie_poster</string>
+    <string name="movie_description_stub" translatable="false">Movie description</string>
+    <string name="genre">"Genres: "</string>
+    <string name="movie_genre_stub" translatable="false">Some Genre</string>
+    <string name="country">"Countries: "</string>
+    <string name="movie_country_stub" translatable="false">Country</string>
 </resources>

@@ -7,7 +7,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.gsench.senchenok.databinding.MovieListItemBinding
 
-class MovieListAdapter(val context: Context) : RecyclerView.Adapter<MovieListAdapter.MovieListItemViewHolder>() {
+class MovieListAdapter(
+    val context: Context,
+    val onMovieClick: (movieID: Int) -> Unit
+) : RecyclerView.Adapter<MovieListAdapter.MovieListItemViewHolder>() {
 
     private val movieList: MutableList<MovieListItem> = mutableListOf()
 
@@ -39,6 +42,7 @@ class MovieListAdapter(val context: Context) : RecyclerView.Adapter<MovieListAda
                 .with(context)
                 .load(movieList[position].iconUrl)
                 .into(movieIcon)
+            movieCard.setOnClickListener { onMovieClick(movieList[position].id) }
         }
     }
 }

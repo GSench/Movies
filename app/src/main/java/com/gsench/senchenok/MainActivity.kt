@@ -18,6 +18,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.Locale
 
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -30,11 +31,17 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+//        window.setFlags(
+//            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+//            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+//        )
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.mainToolbar.title = getString(R.string.popular_title)
         setSupportActionBar(binding.mainToolbar)
-        movieListAdapter = MovieListAdapter(this)
+        movieListAdapter = MovieListAdapter(this, ::onMovieClick)
         val movieLayoutManager = LinearLayoutManager(this)
         with(binding.movieListView) {
             layoutManager = movieLayoutManager
@@ -61,7 +68,17 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+
         loadNewPage()
+    }
+
+    private fun onMovieClick(id: Int) {
+        Log.d("onMovieClick", "id = $id")
+        val transaction = supportFragmentManager.beginTransaction()
+        val movieFragment = MovieFragment.newInstance(id, kinopoiskApi)
+        transaction.addToBackStack(MovieFragment.MOVIE_FRAGMENT_ID)
+        transaction.replace(R.id.movie_details_fragment_view, movieFragment)
+        transaction.commit()
     }
 
     private fun loadNewPage() {
@@ -69,7 +86,7 @@ class MainActivity : AppCompatActivity() {
             isLoading = true
             CoroutineScope(Dispatchers.IO).launch {
                 val kinopoiskMoviesList = kinopoiskApi.getTop100Movies(
-                    token = "e30ffed0-76ab-4dd6-b41f-4c9da2b2735b",
+                    token = KINOPOISK_TOKEN,
                     page = ++lastMovieListPageLoaded
                 )
                 runOnUiThread {
@@ -78,15 +95,15 @@ class MainActivity : AppCompatActivity() {
                         .films
                         .map { kinopoiskMovie ->
                             MovieListItem(
+                                id = kinopoiskMovie.filmId ?: -1,
                                 title = arrayOf(
                                     kinopoiskMovie.nameRu,
-                                    kinopoiskMovie.nameOriginal,
                                     kinopoiskMovie.nameEn,
                                     "???"
                                     ).firstNotNullOf {it},
                                 genre = kinopoiskMovie
                                     .genres
-                                    .take(3).joinToString { genreObj ->
+                                    ?.take(3)?.joinToString { genreObj ->
                                         genreObj.genre.replaceFirstChar {
                                             if (it.isLowerCase()) it.titlecase(
                                                 Locale.getDefault()
