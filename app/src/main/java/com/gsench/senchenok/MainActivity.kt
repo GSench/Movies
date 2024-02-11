@@ -83,7 +83,13 @@ class MainActivity : AppCompatActivity() {
     private fun loadNewPage() {
         if(lastMovieListPageLoaded < totalPagesCount && !isLoading) {
             isLoading = true
-            movieListFooterAdapter.showLoading()
+            if(lastMovieListPageLoaded==0){
+                binding.progressBar.visibility = View.VISIBLE
+                movieListFooterAdapter.hideLoading()
+            } else {
+                binding.progressBar.visibility = View.GONE
+                movieListFooterAdapter.showLoading()
+            }
             CoroutineScope(Dispatchers.IO).launch {
                 val kinopoiskMoviesList = kinopoiskApi.getTop100Movies(
                     token = KINOPOISK_TOKEN,

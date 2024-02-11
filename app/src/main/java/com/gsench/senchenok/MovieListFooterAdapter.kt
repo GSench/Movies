@@ -1,5 +1,6 @@
 package com.gsench.senchenok
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -16,14 +17,16 @@ class MovieListFooterAdapter : RecyclerView.Adapter<MovieListFooterAdapter.Movie
         return MovieListFooterViewHolder(binding)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun showLoading() {
         isVisible = true
-        notifyItemInserted(0)
+        notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun hideLoading(){
         isVisible = false
-        notifyItemRemoved(0)
+        notifyDataSetChanged()
     }
 
     override fun getItemCount() = if(isVisible) 1 else 0
