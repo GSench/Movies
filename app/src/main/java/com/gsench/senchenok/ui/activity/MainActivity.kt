@@ -1,24 +1,31 @@
-package com.gsench.senchenok
+package com.gsench.senchenok.ui.activity
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import com.gsench.senchenok.KINOPOISK_TOKEN
+import com.gsench.senchenok.MyApplication
+import com.gsench.senchenok.ui.fragment.MovieFragment
+import com.gsench.senchenok.ui.adapter.MovieListAdapter
+import com.gsench.senchenok.ui.adapter.MovieListFooterAdapter
+import com.gsench.senchenok.R
+import com.gsench.senchenok.data.network.HttpClient
 import com.gsench.senchenok.databinding.ActivityMainBinding
 import com.gsench.senchenok.kinopoisk_api.KinopoiskApi
 import com.gsench.senchenok.kinopoisk_api.instantiateKinopoiskApi
+import com.gsench.senchenok.ui.viewmodel.mapping.toMovieViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var httpClient: HttpClient
     private lateinit var kinopoiskApi: KinopoiskApi
     private lateinit var movieListAdapter: MovieListAdapter
     private lateinit var movieListFooterAdapter: MovieListFooterAdapter
@@ -29,16 +36,25 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-//        window.setFlags(
-//            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-//            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-//        )
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setupToolbar()
+        setupMovieList()
+        setupNetwork()
+        loadNewPage()
+    }
+
+    private fun setupNetwork() {
+        httpClient = (application as MyApplication).httpClient
+        kinopoiskApi = instantiateKinopoiskApi(httpClient.okHttpClient)
+    }
+
+    private fun setupToolbar() {
         binding.mainToolbar.title = getString(R.string.popular_title)
         setSupportActionBar(binding.mainToolbar)
+    }
+
+    private fun setupMovieList() {
         movieListAdapter = MovieListAdapter(this, ::onMovieClick)
         val movieLayoutManager = LinearLayoutManager(this)
 
@@ -48,24 +64,17 @@ class MainActivity : AppCompatActivity() {
         with(binding.movieListView) {
             layoutManager = movieLayoutManager
             adapter = concatAdapter
+            addOnScrollListener(object: OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    val lastVisibleItem = movieLayoutManager.findLastVisibleItemPosition()
+                    if(lastVisibleItem > movieListAdapter.itemCount - 6) loadNewPage()
+                }
+            })
         }
-
-        kinopoiskApi = instantiateKinopoiskApi()
-
-        binding.movieListView.addOnScrollListener(object: OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                val lastVisibleItem = movieLayoutManager.findLastVisibleItemPosition()
-                Log.d("RECYCLER_VIEW", "lastVisibleItem = ${lastVisibleItem}")
-                if(lastVisibleItem > movieListAdapter.itemCount - 6) loadNewPage()
-            }
-        })
-
-        loadNewPage()
     }
 
     private fun onMovieClick(id: Int) {
-        Log.d("onMovieClick", "id = $id")
         val transaction = supportFragmentManager.beginTransaction()
         val movieFragment = MovieFragment.newInstance(id)
         supportFragmentManager.popBackStack()
@@ -83,13 +92,7 @@ class MainActivity : AppCompatActivity() {
     private fun loadNewPage() {
         if(lastMovieListPageLoaded < totalPagesCount && !isLoading) {
             isLoading = true
-            if(lastMovieListPageLoaded==0){
-                binding.progressBar.visibility = View.VISIBLE
-                movieListFooterAdapter.hideLoading()
-            } else {
-                binding.progressBar.visibility = View.GONE
-                movieListFooterAdapter.showLoading()
-            }
+            showLoading()
             CoroutineScope(Dispatchers.IO).launch {
                 val kinopoiskMoviesList = kinopoiskApi.getTop100Movies(
                     token = KINOPOISK_TOKEN,
@@ -99,33 +102,28 @@ class MainActivity : AppCompatActivity() {
                     totalPagesCount = kinopoiskMoviesList.pagesCount
                     movieListAdapter.appendMovies(kinopoiskMoviesList
                         .films
-                        .map { kinopoiskMovie ->
-                            MovieListItem(
-                                id = kinopoiskMovie.filmId ?: -1,
-                                title = arrayOf(
-                                    kinopoiskMovie.nameRu,
-                                    kinopoiskMovie.nameEn,
-                                    "???"
-                                    ).firstNotNullOf {it},
-                                genre = kinopoiskMovie
-                                    .genres
-                                    ?.take(3)?.joinToString { genreObj ->
-                                        genreObj.genre.replaceFirstChar {
-                                            if (it.isLowerCase()) it.titlecase(
-                                                Locale.getDefault()
-                                            ) else it.toString()
-                                        }
-                                    } ?:"???",
-                                year = kinopoiskMovie.year?:"???",
-                                iconUrl = kinopoiskMovie.posterUrlPreview?:"???"
-                            ) }
+                        .map { it.toMovieViewModel() }
                     )
                     isLoading = false
-                    movieListFooterAdapter.hideLoading()
-                    binding.progressBar.visibility = View.GONE
+                    hideLoading()
                 }
             }
         }
+    }
+
+    private fun showLoading() {
+        if(lastMovieListPageLoaded==0){
+            binding.progressBar.visibility = View.VISIBLE
+            movieListFooterAdapter.hideLoading()
+        } else {
+            binding.progressBar.visibility = View.GONE
+            movieListFooterAdapter.showLoading()
+        }
+    }
+
+    private fun hideLoading() {
+        movieListFooterAdapter.hideLoading()
+        binding.progressBar.visibility = View.GONE
     }
 
 }

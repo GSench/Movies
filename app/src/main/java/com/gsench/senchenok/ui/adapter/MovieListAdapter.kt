@@ -1,12 +1,15 @@
-package com.gsench.senchenok
+package com.gsench.senchenok.ui.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.gsench.senchenok.R
 import com.gsench.senchenok.databinding.MovieListItemBinding
-import com.gsench.senchenok.ui.elements.getShimmerDrawable
+import com.gsench.senchenok.ui.ui_elements.getShimmerDrawable
+import com.gsench.senchenok.ui.viewmodel.MovieListItem
 
 class MovieListAdapter(
     val context: Context,
@@ -43,6 +46,7 @@ class MovieListAdapter(
                 .with(context)
                 .load(movieList[position].iconUrl)
                 .placeholder(getShimmerDrawable())
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(movieIcon)
             movieCard.setOnClickListener { onMovieClick(movieList[position].id) }
         }

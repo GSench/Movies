@@ -9,6 +9,9 @@ import retrofit2.http.Header
 import retrofit2.http.Path
 import retrofit2.http.Query
 
+object KinopoiskApiValues {
+    const val KINOPOISK_API_URL = "https://kinopoiskapiunofficial.tech"
+}
 interface KinopoiskApi {
     @GET("api/v2.2/films/top?type=TOP_100_POPULAR_FILMS")
     suspend fun getTop100Movies(
@@ -24,15 +27,12 @@ interface KinopoiskApi {
 
 }
 
-fun instantiateKinopoiskApi(): KinopoiskApi {
+fun instantiateKinopoiskApi(httpClient: OkHttpClient): KinopoiskApi {
     val httpInterceptor = HttpLoggingInterceptor()
     httpInterceptor.level = HttpLoggingInterceptor.Level.BODY
-    val httpClient = OkHttpClient.Builder()
-        .addInterceptor(httpInterceptor)
-        .build()
     val retrofit = Retrofit.Builder()
         .client(httpClient)
-        .baseUrl("https://kinopoiskapiunofficial.tech")
+        .baseUrl(KinopoiskApiValues.KINOPOISK_API_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     return retrofit.create(KinopoiskApi::class.java)

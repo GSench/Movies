@@ -1,4 +1,4 @@
-package com.gsench.senchenok.ui.elements
+package com.gsench.senchenok.ui.ui_elements
 
 import com.facebook.shimmer.Shimmer
 import com.facebook.shimmer.ShimmerDrawable

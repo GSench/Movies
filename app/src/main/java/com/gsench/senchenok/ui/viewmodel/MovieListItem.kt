@@ -1,4 +1,4 @@
-package com.gsench.senchenok
+package com.gsench.senchenok.ui.viewmodel
 
 data class MovieListItem (
     val id: Int,
