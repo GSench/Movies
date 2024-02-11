@@ -56,4 +56,6 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.7.2")
     implementation("com.squareup.okhttp3:logging-interceptor:4.7.2")
 
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+
 }

@@ -2,4 +2,5 @@
 <resources>
     <dimen name="toolbar_elevation">4dp</dimen>
     <dimen name="title_margin_start">32dp</dimen>
+    <dimen name="movie_list_item_size">140dp</dimen>
 </resources>

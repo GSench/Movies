@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
@@ -24,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var kinopoiskApi: KinopoiskApi
     private lateinit var movieListAdapter: MovieListAdapter
+    private lateinit var movieListFooterAdapter: MovieListFooterAdapter
 
     private var totalPagesCount = 1
     private var lastMovieListPageLoaded = 0
@@ -43,9 +45,13 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.mainToolbar)
         movieListAdapter = MovieListAdapter(this, ::onMovieClick)
         val movieLayoutManager = LinearLayoutManager(this)
+
+        movieListFooterAdapter = MovieListFooterAdapter()
+        val concatAdapter = ConcatAdapter(movieListAdapter, movieListFooterAdapter)
+
         with(binding.movieListView) {
             layoutManager = movieLayoutManager
-            adapter = movieListAdapter
+            adapter = concatAdapter
         }
         val httpInterceptor = HttpLoggingInterceptor()
         httpInterceptor.level = HttpLoggingInterceptor.Level.BODY
@@ -68,7 +74,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-
         loadNewPage()
     }
 
@@ -84,6 +89,7 @@ class MainActivity : AppCompatActivity() {
     private fun loadNewPage() {
         if(lastMovieListPageLoaded < totalPagesCount && !isLoading) {
             isLoading = true
+            movieListFooterAdapter.showLoading()
             CoroutineScope(Dispatchers.IO).launch {
                 val kinopoiskMoviesList = kinopoiskApi.getTop100Movies(
                     token = KINOPOISK_TOKEN,
@@ -115,6 +121,7 @@ class MainActivity : AppCompatActivity() {
                             ) }
                     )
                     isLoading = false
+                    movieListFooterAdapter.hideLoading()
                     binding.progressBar.visibility = View.GONE
                 }
             }
