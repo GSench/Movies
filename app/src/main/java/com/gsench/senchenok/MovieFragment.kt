@@ -1,5 +1,6 @@
 package com.gsench.senchenok
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -7,6 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.gsench.senchenok.databinding.FragmentMovieBinding
 import com.gsench.senchenok.kinopoisk_api.KinopoiskApi
 import com.gsench.senchenok.kinopoisk_api.instantiateKinopoiskApi
@@ -43,6 +48,11 @@ class MovieFragment: Fragment() {
     }
 
     private fun loadMovieDetails(kinopoiskFilmId: Int) {
+        with(binding){
+            movieDetailsContent.visibility = View.GONE
+            moviePosterPlaceholder.startShimmer()
+            movieDetailsPlaceholder.startShimmer()
+        }
         uiScope.launch(Dispatchers.IO){
             val kinopoiskMovieDetails = kinopoiskApi.getMovieDetails(KINOPOISK_TOKEN, kinopoiskFilmId)
             withContext(Dispatchers.Main){
@@ -71,7 +81,30 @@ class MovieFragment: Fragment() {
                     Glide
                         .with(this@MovieFragment)
                         .load(kinopoiskMovieDetails.posterUrl)
+                        .addListener(object: RequestListener<Drawable> {
+                            override fun onLoadFailed(
+                                e: GlideException?,
+                                model: Any?,
+                                target: Target<Drawable>?,
+                                isFirstResource: Boolean
+                            ): Boolean {
+                                return false
+                            }
+
+                            override fun onResourceReady(
+                                resource: Drawable?,
+                                model: Any?,
+                                target: Target<Drawable>?,
+                                dataSource: DataSource?,
+                                isFirstResource: Boolean
+                            ): Boolean {
+                                moviePosterPlaceholder.visibility = View.GONE
+                                return false
+                            }
+                        })
                         .into(moviePoster)
+                    movieDetailsPlaceholder.visibility = View.GONE
+                    movieDetailsContent.visibility = View.VISIBLE
                 }
             }
         }

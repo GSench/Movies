@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.gsench.senchenok.databinding.MovieListItemBinding
+import com.gsench.senchenok.ui.elements.getShimmerDrawable
 
 class MovieListAdapter(
     val context: Context,
@@ -41,6 +42,7 @@ class MovieListAdapter(
             Glide
                 .with(context)
                 .load(movieList[position].iconUrl)
+                .placeholder(getShimmerDrawable())
                 .into(movieIcon)
             movieCard.setOnClickListener { onMovieClick(movieList[position].id) }
         }
