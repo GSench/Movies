@@ -69,6 +69,12 @@ class MainActivity : AppCompatActivity() {
         val transaction = supportFragmentManager.beginTransaction()
         val movieFragment = MovieFragment.newInstance(id)
         supportFragmentManager.popBackStack()
+        transaction.setCustomAnimations(
+            R.anim.slide_in,
+            R.anim.fade_out,
+            R.anim.slide_in,
+            R.anim.fade_out,
+        )
         transaction.addToBackStack(MovieFragment.MOVIE_FRAGMENT_ID)
         transaction.replace(R.id.movie_details_fragment_view, movieFragment)
         transaction.commit()
