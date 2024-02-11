@@ -68,6 +68,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("onMovieClick", "id = $id")
         val transaction = supportFragmentManager.beginTransaction()
         val movieFragment = MovieFragment.newInstance(id)
+        supportFragmentManager.popBackStack()
         transaction.addToBackStack(MovieFragment.MOVIE_FRAGMENT_ID)
         transaction.replace(R.id.movie_details_fragment_view, movieFragment)
         transaction.commit()
