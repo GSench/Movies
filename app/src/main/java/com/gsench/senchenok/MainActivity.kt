@@ -10,15 +10,11 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.gsench.senchenok.databinding.ActivityMainBinding
 import com.gsench.senchenok.kinopoisk_api.KinopoiskApi
+import com.gsench.senchenok.kinopoisk_api.instantiateKinopoiskApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.util.Locale
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -53,17 +49,8 @@ class MainActivity : AppCompatActivity() {
             layoutManager = movieLayoutManager
             adapter = concatAdapter
         }
-        val httpInterceptor = HttpLoggingInterceptor()
-        httpInterceptor.level = HttpLoggingInterceptor.Level.BODY
-        val httpClient = OkHttpClient.Builder()
-            .addInterceptor(httpInterceptor)
-            .build()
-        val retrofit = Retrofit.Builder()
-            .client(httpClient)
-            .baseUrl("https://kinopoiskapiunofficial.tech")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        kinopoiskApi = retrofit.create(KinopoiskApi::class.java)
+
+        kinopoiskApi = instantiateKinopoiskApi()
 
         binding.movieListView.addOnScrollListener(object: OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -80,7 +67,7 @@ class MainActivity : AppCompatActivity() {
     private fun onMovieClick(id: Int) {
         Log.d("onMovieClick", "id = $id")
         val transaction = supportFragmentManager.beginTransaction()
-        val movieFragment = MovieFragment.newInstance(id, kinopoiskApi)
+        val movieFragment = MovieFragment.newInstance(id)
         transaction.addToBackStack(MovieFragment.MOVIE_FRAGMENT_ID)
         transaction.replace(R.id.movie_details_fragment_view, movieFragment)
         transaction.commit()

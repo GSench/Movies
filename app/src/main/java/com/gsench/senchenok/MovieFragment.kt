@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.gsench.senchenok.databinding.FragmentMovieBinding
 import com.gsench.senchenok.kinopoisk_api.KinopoiskApi
+import com.gsench.senchenok.kinopoisk_api.instantiateKinopoiskApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -30,6 +31,7 @@ class MovieFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentMovieBinding.inflate(layoutInflater)
+        kinopoiskApi = instantiateKinopoiskApi()
         return binding.root
     }
 
@@ -83,9 +85,8 @@ class MovieFragment: Fragment() {
     companion object {
         const val MOVIE_FRAGMENT_ID = "MOVIE_FRAGMENT_ID"
         const val KINOPOISK_FILM_ID = "KINOPOISK_FILM_ID"
-        fun newInstance(kinopoiskFilmId: Int, kinopoiskApi: KinopoiskApi): MovieFragment {
+        fun newInstance(kinopoiskFilmId: Int): MovieFragment {
             val movieFragment = MovieFragment()
-            movieFragment.kinopoiskApi = kinopoiskApi
             val args = Bundle()
             args.putInt(KINOPOISK_FILM_ID, kinopoiskFilmId)
             movieFragment.arguments = args
