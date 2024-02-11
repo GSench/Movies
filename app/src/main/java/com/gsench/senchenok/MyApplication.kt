@@ -1,14 +1,14 @@
 package com.gsench.senchenok
 
 import android.app.Application
-import com.gsench.senchenok.data.network.HttpClient
+import com.gsench.senchenok.data.network.Network
 
 class MyApplication: Application() {
 
-    lateinit var httpClient: HttpClient
+    lateinit var network: Network
     override fun onCreate() {
         super.onCreate()
-        httpClient = HttpClient(this)
+        network = Network(this)
     }
 
 }

@@ -13,7 +13,7 @@ import com.gsench.senchenok.ui.fragment.MovieFragment
 import com.gsench.senchenok.ui.adapter.MovieListAdapter
 import com.gsench.senchenok.ui.adapter.MovieListFooterAdapter
 import com.gsench.senchenok.R
-import com.gsench.senchenok.data.network.HttpClient
+import com.gsench.senchenok.data.network.Network
 import com.gsench.senchenok.databinding.ActivityMainBinding
 import com.gsench.senchenok.kinopoisk_api.KinopoiskApi
 import com.gsench.senchenok.kinopoisk_api.instantiateKinopoiskApi
@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var httpClient: HttpClient
+    private lateinit var network: Network
     private lateinit var kinopoiskApi: KinopoiskApi
     private lateinit var movieListAdapter: MovieListAdapter
     private lateinit var movieListFooterAdapter: MovieListFooterAdapter
@@ -45,8 +45,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupNetwork() {
-        httpClient = (application as MyApplication).httpClient
-        kinopoiskApi = instantiateKinopoiskApi(httpClient.okHttpClient)
+        network = (application as MyApplication).network
+        kinopoiskApi = instantiateKinopoiskApi(network.httpClient)
     }
 
     private fun setupToolbar() {

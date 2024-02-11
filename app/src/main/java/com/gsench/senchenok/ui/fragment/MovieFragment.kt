@@ -52,8 +52,8 @@ class MovieFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentMovieBinding.inflate(layoutInflater)
-        val httpClient = (activity?.application as MyApplication).httpClient
-        kinopoiskApi = instantiateKinopoiskApi(httpClient.okHttpClient)
+        val httpClient = (activity?.application as MyApplication).network
+        kinopoiskApi = instantiateKinopoiskApi(httpClient.httpClient)
         return binding.root
     }
 

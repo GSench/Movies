@@ -15,14 +15,14 @@ import okhttp3.logging.HttpLoggingInterceptor
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-class HttpClient(context: Context) {
+class Network(context: Context) {
 
-    var isNetworkAvailable = false
+    var networkState = NetworkState.UNDEFINED
         private set
 
     init {
-        isNetworkAvailable(context)
-            .onEach { isNetworkAvailable = it }
+        networkStateFlow(context)
+            .onEach { networkState = it }
             .launchIn(CoroutineScope(Dispatchers.IO))
     }
 
@@ -46,14 +46,14 @@ class HttpClient(context: Context) {
     private val forceCacheInterceptor = object: Interceptor {
         override fun intercept(chain: Interceptor.Chain): Response {
             val builder: Request.Builder = chain.request().newBuilder()
-            if (!isNetworkAvailable) {
+            if (networkState != NetworkState.AVAILABLE) {
                 builder.cacheControl(CacheControl.FORCE_CACHE)
             }
             return chain.proceed(builder.build())
         }
     }
 
-    val okHttpClient = OkHttpClient
+    val httpClient = OkHttpClient
         .Builder()
         .cache(
             Cache(

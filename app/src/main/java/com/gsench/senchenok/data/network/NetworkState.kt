@@ -10,6 +10,12 @@ import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
+enum class NetworkState {
+    UNDEFINED,
+    AVAILABLE,
+    UNAVAILABLE,
+}
+
 private val networkRequest = NetworkRequest
     .Builder()
     .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
@@ -17,21 +23,22 @@ private val networkRequest = NetworkRequest
     .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
     .build()
 
-fun isNetworkAvailable(context: Context) : Flow<Boolean> {
+fun networkStateFlow(context: Context) : Flow<NetworkState> {
     val connectivityManager = context.getSystemService(ConnectivityManager::class.java) as ConnectivityManager
     return callbackFlow {
+        trySendBlocking(NetworkState.UNDEFINED)
         connectivityManager.requestNetwork(networkRequest, object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
-                trySendBlocking(true)
+                trySendBlocking(NetworkState.AVAILABLE)
             }
             override fun onUnavailable() {
                 super.onUnavailable()
-                trySendBlocking(false)
+                trySendBlocking(NetworkState.UNAVAILABLE)
             }
             override fun onLost(network: Network) {
                 super.onLost(network)
-                trySendBlocking(false)
+                trySendBlocking(NetworkState.UNAVAILABLE)
             }
         })
         awaitClose()
