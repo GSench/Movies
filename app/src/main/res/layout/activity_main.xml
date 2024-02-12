@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.activity.MainActivity">
+    tools:context=".ui.view.activity.MainActivity">
 
     <ProgressBar
         android:id="@+id/progress_bar"
@@ -50,6 +50,9 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/movie_details_fragment_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        app:behavior_hideable="false"
+        app:behavior_peekHeight="0dp"
+        app:layout_behavior="@string/bottom_sheet_behavior"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

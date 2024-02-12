@@ -1,4 +1,4 @@
-package com.gsench.senchenok.kinopoisk_api
+package com.gsench.senchenok.domain.model
 
 data class KinopoiskMovieDetails(
     val completed: Boolean?,

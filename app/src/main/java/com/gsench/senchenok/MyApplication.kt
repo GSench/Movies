@@ -1,7 +1,7 @@
 package com.gsench.senchenok
 
 import android.app.Application
-import com.gsench.senchenok.data.network.Network
+import com.gsench.senchenok.domain.network.Network
 
 class MyApplication: Application() {
 

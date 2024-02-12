@@ -1,4 +1,4 @@
-package com.gsench.senchenok.ui.activity
+package com.gsench.senchenok.ui.view.activity
 
 import android.os.Bundle
 import android.view.View
@@ -9,15 +9,14 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.gsench.senchenok.KINOPOISK_TOKEN
 import com.gsench.senchenok.MyApplication
-import com.gsench.senchenok.ui.fragment.MovieFragment
-import com.gsench.senchenok.ui.adapter.MovieListAdapter
-import com.gsench.senchenok.ui.adapter.MovieListFooterAdapter
+import com.gsench.senchenok.ui.view.fragment.MovieFragment
+import com.gsench.senchenok.ui.view.adapter.MovieListAdapter
+import com.gsench.senchenok.ui.view.adapter.MovieListFooterAdapter
 import com.gsench.senchenok.R
-import com.gsench.senchenok.data.network.Network
+import com.gsench.senchenok.domain.network.Network
 import com.gsench.senchenok.databinding.ActivityMainBinding
-import com.gsench.senchenok.kinopoisk_api.KinopoiskApi
-import com.gsench.senchenok.kinopoisk_api.instantiateKinopoiskApi
-import com.gsench.senchenok.ui.viewmodel.mapping.toMovieViewModel
+import com.gsench.senchenok.domain.kinopoisk_api.KinopoiskApi
+import com.gsench.senchenok.ui.view.viewmodel.mapping.toMovieViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -46,7 +45,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupNetwork() {
         network = (application as MyApplication).network
-        kinopoiskApi = instantiateKinopoiskApi(network.httpClient)
+        kinopoiskApi = KinopoiskApi.instantiateKinopoiskApi(network.httpClient)
     }
 
     private fun setupToolbar() {

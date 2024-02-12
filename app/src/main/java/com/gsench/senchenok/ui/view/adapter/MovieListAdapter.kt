@@ -1,4 +1,4 @@
-package com.gsench.senchenok.ui.adapter
+package com.gsench.senchenok.ui.view.adapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -9,7 +9,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.gsench.senchenok.R
 import com.gsench.senchenok.databinding.MovieListItemBinding
 import com.gsench.senchenok.ui.ui_elements.getShimmerDrawable
-import com.gsench.senchenok.ui.viewmodel.MovieListItem
+import com.gsench.senchenok.ui.view.viewmodel.MovieListItem
 
 class MovieListAdapter(
     val context: Context,

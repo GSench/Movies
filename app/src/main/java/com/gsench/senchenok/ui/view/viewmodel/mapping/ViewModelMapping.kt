@@ -1,11 +1,11 @@
-package com.gsench.senchenok.ui.viewmodel.mapping
+package com.gsench.senchenok.ui.view.viewmodel.mapping
 
-import com.gsench.senchenok.kinopoisk_api.Country
-import com.gsench.senchenok.kinopoisk_api.Genre
-import com.gsench.senchenok.ui.viewmodel.MovieListItem
-import com.gsench.senchenok.kinopoisk_api.KinopoiskMovie
-import com.gsench.senchenok.kinopoisk_api.KinopoiskMovieDetails
-import com.gsench.senchenok.ui.viewmodel.MovieDetails
+import com.gsench.senchenok.domain.model.Country
+import com.gsench.senchenok.domain.model.Genre
+import com.gsench.senchenok.ui.view.viewmodel.MovieListItem
+import com.gsench.senchenok.domain.model.KinopoiskMovie
+import com.gsench.senchenok.domain.model.KinopoiskMovieDetails
+import com.gsench.senchenok.ui.view.viewmodel.MovieDetails
 import java.util.Locale
 
 fun KinopoiskMovie.toMovieViewModel() = MovieListItem(

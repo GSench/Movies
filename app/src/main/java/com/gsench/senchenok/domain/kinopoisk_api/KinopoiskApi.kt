@@ -1,5 +1,7 @@
-package com.gsench.senchenok.kinopoisk_api
+package com.gsench.senchenok.domain.kinopoisk_api
 
+import com.gsench.senchenok.domain.model.KinopoiskMovieDetails
+import com.gsench.senchenok.domain.model.KinopoiskMoviesList
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -25,15 +27,16 @@ interface KinopoiskApi {
         @Path("id") id: Int
     ): KinopoiskMovieDetails
 
-}
-
-fun instantiateKinopoiskApi(httpClient: OkHttpClient): KinopoiskApi {
-    val httpInterceptor = HttpLoggingInterceptor()
-    httpInterceptor.level = HttpLoggingInterceptor.Level.BODY
-    val retrofit = Retrofit.Builder()
-        .client(httpClient)
-        .baseUrl(KinopoiskApiValues.KINOPOISK_API_URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-    return retrofit.create(KinopoiskApi::class.java)
+    companion object {
+        fun instantiateKinopoiskApi(httpClient: OkHttpClient): KinopoiskApi {
+            val httpInterceptor = HttpLoggingInterceptor()
+            httpInterceptor.level = HttpLoggingInterceptor.Level.BODY
+            val retrofit = Retrofit.Builder()
+                .client(httpClient)
+                .baseUrl(KinopoiskApiValues.KINOPOISK_API_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+            return retrofit.create(KinopoiskApi::class.java)
+        }
+    }
 }

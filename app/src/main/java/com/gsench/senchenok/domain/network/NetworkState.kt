@@ -1,4 +1,4 @@
-package com.gsench.senchenok.data.network
+package com.gsench.senchenok.domain.network
 
 import android.content.Context
 import android.net.ConnectivityManager

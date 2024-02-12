@@ -1,4 +1,4 @@
-package com.gsench.senchenok.ui.adapter
+package com.gsench.senchenok.ui.view.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater

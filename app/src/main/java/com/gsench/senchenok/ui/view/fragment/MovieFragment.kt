@@ -1,4 +1,4 @@
-package com.gsench.senchenok.ui.fragment
+package com.gsench.senchenok.ui.view.fragment
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -16,10 +16,9 @@ import com.bumptech.glide.request.target.Target
 import com.gsench.senchenok.KINOPOISK_TOKEN
 import com.gsench.senchenok.MyApplication
 import com.gsench.senchenok.databinding.FragmentMovieBinding
-import com.gsench.senchenok.kinopoisk_api.KinopoiskApi
-import com.gsench.senchenok.kinopoisk_api.instantiateKinopoiskApi
-import com.gsench.senchenok.ui.viewmodel.MovieDetails
-import com.gsench.senchenok.ui.viewmodel.mapping.toMovieDetailsViewModel
+import com.gsench.senchenok.domain.kinopoisk_api.KinopoiskApi
+import com.gsench.senchenok.ui.view.viewmodel.MovieDetails
+import com.gsench.senchenok.ui.view.viewmodel.mapping.toMovieDetailsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -53,7 +52,7 @@ class MovieFragment: Fragment() {
     ): View {
         binding = FragmentMovieBinding.inflate(layoutInflater)
         val httpClient = (activity?.application as MyApplication).network
-        kinopoiskApi = instantiateKinopoiskApi(httpClient.httpClient)
+        kinopoiskApi = KinopoiskApi.instantiateKinopoiskApi(httpClient.httpClient)
         return binding.root
     }
 
