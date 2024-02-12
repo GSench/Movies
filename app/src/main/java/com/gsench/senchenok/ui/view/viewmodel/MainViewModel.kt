@@ -41,7 +41,7 @@ class MainViewModel (
     val loadingStateFlow = MutableLiveData(LoadingState.IDLE)
     val moviesList = MutableLiveData<MutableList<MovieListItem>>(mutableListOf())
 
-    private var page = KinopoiskApiValues.INITIAL_PAGE
+    private var page = KinopoiskApiValues.INITIAL_PAGE - 1
     private var totalPages = 1
 
     private val pageLiveData = MutableLiveData(page)
@@ -59,9 +59,10 @@ class MainViewModel (
         .launchIn(CoroutineScope(Dispatchers.IO))
 
     private suspend fun onListScrolledToBottom() {
+        if(page >= totalPages) return
         loadingStateFlow.postValue(LoadingState.LOADING)
-        Log.d("LOADING LIST FLOW", "page.value = ${page}")
-        when(val loadResult = repository.getTop100Movies(page)){
+        Log.d("LOADING LIST FLOW", "page.value = ${page+1}")
+        when(val loadResult = repository.getTop100Movies(page+1)){
             is LoadResult.Success -> {
                 incrementPage(loadResult.data.pagesCount)
                 val appendMoviesList = loadResult.data.films.map { it.toMovieViewModel() }
