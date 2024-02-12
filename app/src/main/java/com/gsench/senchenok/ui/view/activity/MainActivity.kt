@@ -2,36 +2,32 @@ package com.gsench.senchenok.ui.view.activity
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
-import com.gsench.senchenok.KINOPOISK_TOKEN
-import com.gsench.senchenok.MyApplication
-import com.gsench.senchenok.ui.view.fragment.MovieFragment
+import com.gsench.senchenok.R
+import com.gsench.senchenok.databinding.ActivityMainBinding
+import com.gsench.senchenok.ui.view.UIEvent
 import com.gsench.senchenok.ui.view.adapter.MovieListAdapter
 import com.gsench.senchenok.ui.view.adapter.MovieListFooterAdapter
-import com.gsench.senchenok.R
-import com.gsench.senchenok.domain.network.Network
-import com.gsench.senchenok.databinding.ActivityMainBinding
-import com.gsench.senchenok.domain.kinopoisk_api.KinopoiskApi
-import com.gsench.senchenok.ui.view.viewmodel.mapping.toMovieViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.gsench.senchenok.ui.view.fragment.MovieFragment
+import com.gsench.senchenok.ui.view.viewmodel.LoadingState
+import com.gsench.senchenok.ui.view.viewmodel.MainViewModel
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var network: Network
-    private lateinit var kinopoiskApi: KinopoiskApi
+    private val viewModel: MainViewModel by viewModels{MainViewModel.Factory}
     private lateinit var movieListAdapter: MovieListAdapter
     private lateinit var movieListFooterAdapter: MovieListFooterAdapter
-
-    private var totalPagesCount = 1
-    private var lastMovieListPageLoaded = 0
-    private var isLoading = false
+    private lateinit var uiEventsFlow: Flow<UIEvent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,13 +35,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setupToolbar()
         setupMovieList()
-        setupNetwork()
-        loadNewPage()
-    }
-
-    private fun setupNetwork() {
-        network = (application as MyApplication).network
-        kinopoiskApi = KinopoiskApi.instantiateKinopoiskApi(network.httpClient)
+        observeUI()
+        observeViewModel()
+        viewModel.subscribeUI(uiEventsFlow)
     }
 
     private fun setupToolbar() {
@@ -54,7 +46,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupMovieList() {
-        movieListAdapter = MovieListAdapter(this, ::onMovieClick)
+        movieListAdapter = MovieListAdapter(::onMovieClick)
         val movieLayoutManager = LinearLayoutManager(this)
 
         movieListFooterAdapter = MovieListFooterAdapter()
@@ -63,13 +55,22 @@ class MainActivity : AppCompatActivity() {
         with(binding.movieListView) {
             layoutManager = movieLayoutManager
             adapter = concatAdapter
-            addOnScrollListener(object: OnScrollListener() {
+        }
+    }
+
+    fun observeUI() {
+        uiEventsFlow = callbackFlow {
+            binding.movieListView.addOnScrollListener(object: OnScrollListener(){
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
-                    val lastVisibleItem = movieLayoutManager.findLastVisibleItemPosition()
-                    if(lastVisibleItem > movieListAdapter.itemCount - 6) loadNewPage()
+                    val lastVisibleItem = (binding.movieListView.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+                    if(lastVisibleItem > movieListAdapter.itemCount - 6) {
+                        trySendBlocking(UIEvent.SCROLLED_TO_BOTTOM)
+                    }
                 }
             })
+            trySendBlocking(UIEvent.POPULAR_LIST_OPENED)
+            awaitClose()
         }
     }
 
@@ -88,30 +89,24 @@ class MainActivity : AppCompatActivity() {
         transaction.commit()
     }
 
-    private fun loadNewPage() {
-        if(lastMovieListPageLoaded < totalPagesCount && !isLoading) {
-            isLoading = true
-            showLoading()
-            CoroutineScope(Dispatchers.IO).launch {
-                val kinopoiskMoviesList = kinopoiskApi.getTop100Movies(
-                    token = KINOPOISK_TOKEN,
-                    page = ++lastMovieListPageLoaded
-                )
-                runOnUiThread {
-                    totalPagesCount = kinopoiskMoviesList.pagesCount
-                    movieListAdapter.appendMovies(kinopoiskMoviesList
-                        .films
-                        .map { it.toMovieViewModel() }
-                    )
-                    isLoading = false
-                    hideLoading()
-                }
+    private fun observeViewModel() {
+        viewModel.loadingStateFlow.observe(this) {
+            if(it == null) return@observe
+            when(it) {
+                LoadingState.IDLE -> hideLoading()
+                LoadingState.LOADING -> showLoading()
+                LoadingState.ERROR -> hideLoading()
+                LoadingState.INTERNET_ERROR -> hideLoading()
             }
+        }
+        viewModel.moviesList.observe(this) {
+            if(it == null) return@observe
+            movieListAdapter.submitList(it)
         }
     }
 
     private fun showLoading() {
-        if(lastMovieListPageLoaded==0){
+        if(false){
             binding.progressBar.visibility = View.VISIBLE
             movieListFooterAdapter.hideLoading()
         } else {

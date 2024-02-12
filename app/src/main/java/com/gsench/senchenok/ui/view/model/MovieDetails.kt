@@ -1,4 +1,4 @@
-package com.gsench.senchenok.ui.view.viewmodel
+package com.gsench.senchenok.ui.view.model
 
 data class MovieDetails (
     val title: String,

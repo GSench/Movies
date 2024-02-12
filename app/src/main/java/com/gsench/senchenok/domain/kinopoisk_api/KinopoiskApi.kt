@@ -13,6 +13,7 @@ import retrofit2.http.Query
 
 object KinopoiskApiValues {
     const val KINOPOISK_API_URL = "https://kinopoiskapiunofficial.tech"
+    const val INITIAL_PAGE = 1
 }
 interface KinopoiskApi {
     @GET("api/v2.2/films/top?type=TOP_100_POPULAR_FILMS")
