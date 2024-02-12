@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -13,10 +14,10 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.gsench.senchenok.KINOPOISK_TOKEN
 import com.gsench.senchenok.MyApplication
 import com.gsench.senchenok.databinding.FragmentMovieBinding
-import com.gsench.senchenok.domain.kinopoisk_api.KinopoiskApi
+import com.gsench.senchenok.domain.MovieRepository
+import com.gsench.senchenok.domain.network.LoadResult
 import com.gsench.senchenok.ui.view.model.MovieDetails
 import com.gsench.senchenok.ui.view.model.mapping.toMovieDetailsViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -28,7 +29,7 @@ import kotlinx.coroutines.withContext
 class MovieFragment: Fragment() {
 
     private lateinit var binding: FragmentMovieBinding
-    private lateinit var kinopoiskApi: KinopoiskApi
+    private lateinit var repository: MovieRepository
 
     companion object {
         const val MOVIE_FRAGMENT_ID = "MOVIE_FRAGMENT_ID"
@@ -51,8 +52,7 @@ class MovieFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentMovieBinding.inflate(layoutInflater)
-        val httpClient = (activity?.application as MyApplication).network
-        kinopoiskApi = KinopoiskApi.instantiateKinopoiskApi(httpClient.httpClient)
+        repository = (activity?.application as MyApplication).repository
         return binding.root
     }
 
@@ -67,12 +67,18 @@ class MovieFragment: Fragment() {
         showMovieContentLoading()
         showMoviePosterLoading()
         uiScope.launch(Dispatchers.IO){
-            val movieDetails = kinopoiskApi
-                .getMovieDetails(KINOPOISK_TOKEN, kinopoiskFilmId)
-                .toMovieDetailsViewModel()
-            withContext(Dispatchers.Main){
-                setMovieDetails(movieDetails)
-                hideMovieContentLoading()
+            val movieDetails = repository.getMovieDetails(kinopoiskFilmId)
+            when(movieDetails) {
+                is LoadResult.Error -> withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Error", Toast.LENGTH_LONG).show()
+                }
+                is LoadResult.NoConnection -> withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Internet Error", Toast.LENGTH_LONG).show()
+                }
+                is LoadResult.Success -> withContext(Dispatchers.Main) {
+                    setMovieDetails(movieDetails.data.toMovieDetailsViewModel())
+                    hideMovieContentLoading()
+                }
             }
         }
     }

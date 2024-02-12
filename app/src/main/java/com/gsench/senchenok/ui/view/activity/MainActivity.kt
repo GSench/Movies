@@ -2,6 +2,7 @@ package com.gsench.senchenok.ui.view.activity
 
 import android.os.Bundle
 import android.view.View
+import android.view.View.OnClickListener
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ConcatAdapter
@@ -69,6 +70,11 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             })
+            binding.retryButton.setOnClickListener(object: OnClickListener {
+                override fun onClick(v: View?) {
+                    trySendBlocking(UIEvent.RETRY)
+                }
+            })
             trySendBlocking(UIEvent.POPULAR_LIST_OPENED)
             awaitClose()
         }
@@ -93,10 +99,22 @@ class MainActivity : AppCompatActivity() {
         viewModel.loadingStateFlow.observe(this) {
             if(it == null) return@observe
             when(it) {
-                LoadingState.IDLE -> hideLoading()
-                LoadingState.LOADING -> showLoading()
-                LoadingState.ERROR -> hideLoading()
-                LoadingState.INTERNET_ERROR -> hideLoading()
+                LoadingState.IDLE -> {
+                    hideLoading()
+                    hideError()
+                }
+                LoadingState.LOADING -> {
+                    showLoading()
+                    hideError()
+                }
+                LoadingState.ERROR -> {
+                    hideLoading()
+                    showError()
+                }
+                LoadingState.INTERNET_ERROR -> {
+                    hideLoading()
+                    showError()
+                }
             }
         }
         viewModel.moviesList.observe(this) {
@@ -118,6 +136,14 @@ class MainActivity : AppCompatActivity() {
     private fun hideLoading() {
         movieListFooterAdapter.hideLoading()
         binding.progressBar.visibility = View.GONE
+    }
+
+    private fun showError() {
+        binding.loadingErrorView.visibility = View.VISIBLE
+    }
+
+    private fun hideError() {
+        binding.loadingErrorView.visibility = View.GONE
     }
 
 }

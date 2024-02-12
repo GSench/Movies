@@ -54,6 +54,7 @@ class MainViewModel (
             when(it) {
                 UIEvent.SCROLLED_TO_BOTTOM -> onListScrolledToBottom()
                 UIEvent.POPULAR_LIST_OPENED -> onListScrolledToBottom()
+                UIEvent.RETRY -> onListScrolledToBottom()
             }
         }
         .launchIn(CoroutineScope(Dispatchers.IO))

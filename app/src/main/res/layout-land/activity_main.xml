@@ -50,6 +50,45 @@
         app:layout_constraintStart_toStartOf="@id/main_view"
         app:layout_constraintTop_toTopOf="@id/main_view" />
 
+
+    <LinearLayout
+        android:id="@+id/loading_error_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@id/main_view"
+        app:layout_constraintEnd_toEndOf="@id/main_view"
+        app:layout_constraintStart_toStartOf="@id/main_view"
+        app:layout_constraintTop_toTopOf="@id/main_view"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ImageView
+            android:contentDescription="@string/no_internet_icon_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/no_internet_icon"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:maxWidth="300dp"
+            android:layout_height="wrap_content"
+            android:text="@string/internet_error"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textColor="@color/accent"
+            android:layout_marginTop="8dp"/>
+
+        <Button
+            android:id="@+id/retry_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/retry"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/accent"/>
+
+    </LinearLayout>
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/movie_details_fragment_view"
         android:layout_width="0dp"

@@ -35,7 +35,7 @@ class Network(context: Context) {
         override fun intercept(chain: Interceptor.Chain): Response {
             val response: Response = chain.proceed(chain.request())
             val cacheControl = CacheControl.Builder()
-                .maxAge(1, TimeUnit.DAYS)
+                .maxAge(1, TimeUnit.HOURS)
                 .build()
             return response.newBuilder()
                 .header("Cache-Control", cacheControl.toString())
