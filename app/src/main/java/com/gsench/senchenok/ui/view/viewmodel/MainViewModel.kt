@@ -12,7 +12,7 @@ import com.gsench.senchenok.domain.kinopoisk_api.KinopoiskApiValues
 import com.gsench.senchenok.domain.network.LoadResult
 import com.gsench.senchenok.ui.view.UIEvent
 import com.gsench.senchenok.ui.view.model.MovieListItem
-import com.gsench.senchenok.ui.view.model.toMovieViewModel
+import com.gsench.senchenok.ui.view.model.mapping.toMovieViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview

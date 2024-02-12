@@ -18,7 +18,7 @@ import com.gsench.senchenok.MyApplication
 import com.gsench.senchenok.databinding.FragmentMovieBinding
 import com.gsench.senchenok.domain.kinopoisk_api.KinopoiskApi
 import com.gsench.senchenok.ui.view.model.MovieDetails
-import com.gsench.senchenok.ui.view.model.toMovieDetailsViewModel
+import com.gsench.senchenok.ui.view.model.mapping.toMovieDetailsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
