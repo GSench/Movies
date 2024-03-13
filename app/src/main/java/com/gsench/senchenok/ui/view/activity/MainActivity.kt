@@ -2,7 +2,6 @@ package com.gsench.senchenok.ui.view.activity
 
 import android.os.Bundle
 import android.view.View
-import android.view.View.OnClickListener
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ConcatAdapter
@@ -59,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun observeUI() {
+    private fun observeUI() {
         uiEventsFlow = callbackFlow {
             binding.movieListView.addOnScrollListener(object: OnScrollListener(){
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -70,11 +69,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             })
-            binding.retryButton.setOnClickListener(object: OnClickListener {
-                override fun onClick(v: View?) {
-                    trySendBlocking(UIEvent.RETRY)
-                }
-            })
+            binding.retryButton.setOnClickListener { trySendBlocking(UIEvent.RETRY) }
             trySendBlocking(UIEvent.POPULAR_LIST_OPENED)
             awaitClose()
         }
